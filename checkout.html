@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تأكيد الطلب</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f5f6f8;
+  min-height: 100vh;
+}
+
+.checkout-wrapper {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+/* LEFT SIDE - Responsive */
+.checkout-left {
+  width: 100%;
+  background: #f1f2f4;
+  padding: 25px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  order: 2;
+}
+
+.brand-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.total-label {
+  color: #555;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.total-amount {
+  font-size: 36px;
+  font-weight: bold;
+  text-align: center;
+  margin: 0 0 15px 0;
+}
+
+.footer-left {
+  font-size: 13px;
+  color: #777;
+  text-align: center;
+  padding-top: 15px;
+  border-top: 1px solid #ddd;
+}
+
+/* RIGHT SIDE - Responsive */
+.checkout-right {
+  width: 100%;
+  background: #fff;
+  padding: 25px 20px;
+  order: 1;
+  flex: 1;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.lang {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+}
+
+/* Order Summary */
+.order-summary {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid #e9ecef;
+}
+
+.order-summary h4 {
+  margin: 0 0 15px 0;
+  color: #2d3748;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.order-detail {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #4a5568;
+  padding: 5px 0;
+}
+
+.order-detail.total {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid #e2e8f0;
+  font-weight: 700;
+  color: #1a202c;
+  font-size: 18px;
+}
+
+.section {
+  margin-top: 25px;
+}
+
+.section label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border-color 0.3s;
+  background: #fff;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4f6cff;
+  box-shadow: 0 0 0 2px rgba(79, 108, 255, 0.1);
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.row .input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.payment-methods {
+  display: grid;
+  gap: 12px;
+  margin-top: 5px;
+}
+
+.card-box {
+  border: 2px solid #d8defa;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #334155;
+  font-weight: 500;
+  background: #fff;
+  margin-top: 0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.card-box:hover {
+  border-color: #9fb0ff;
+}
+
+.card-box.selected {
+  border-color: #4f6cff;
+  color: #4f6cff;
+  background: #f8faff;
+  box-shadow: 0 0 0 3px rgba(79, 108, 255, 0.08);
+}
+
+.card-box.disabled {
+  border-color: #e2e8f0;
+  color: #94a3b8;
+  background: #f8fafc;
+}
+
+.card-box.disabled:hover {
+  border-color: #cbd5e1;
+}
+
+.payment-badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fff4e5;
+  color: #b45309;
+  border: 1px solid #fbd38d;
+  white-space: nowrap;
+}
+
+.payment-hint {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #b45309;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: none;
+}
+
+.payment-hint.show {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}
+
+.pay-btn {
+  margin-top: 30px;
+  width: 100%;
+  padding: 18px;
+  background: #4f6cff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(79, 108, 255, 0.2);
+}
+
+.pay-btn:hover:not(:disabled) {
+  background: #3a56e8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79, 108, 255, 0.3);
+}
+
+.pay-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pay-btn:disabled {
+  background: #b7c3ff;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.secure {
+  margin-top: 15px;
+  font-size: 13px;
+  color: #555;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* SUCCESS SCREEN */
+.success-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.success-box {
+  max-width: 400px;
+  width: 100%;
+  padding: 30px 20px;
+}
+
+.success-icon {
+  font-size: 70px;
+  color: #2ecc71;
+  margin-bottom: 20px;
+}
+
+.success-box h2 {
+  margin: 0 0 15px 0;
+  font-size: 28px;
+  color: #2d3748;
+}
+
+.success-box p {
+  color: #555;
+  font-size: 16px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.txn {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #777;
+  background: #f8f9fa;
+  padding: 10px 15px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.redirect-message {
+  margin-top: 25px;
+  padding: 15px;
+  background: #edf2f7;
+  border-radius: 8px;
+  color: #4a5568;
+  font-size: 14px;
+  line-height: 1.5;
+  border: 1px solid #e2e8f0;
+}
+
+/* MEDIA QUERIES FOR RESPONSIVE DESIGN */
+
+/* Tablet and larger phones (min-width: 768px) */
+@media (min-width: 768px) {
+  .checkout-wrapper {
+    flex-direction: row;
+  }
+  
+  .checkout-left {
+    width: 40%;
+    padding: 40px 30px;
+    order: 1;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  
+  .checkout-right {
+    width: 60%;
+    padding: 40px 30px;
+    order: 2;
+    overflow-y: auto;
+    height: 100vh;
+  }
+  
+  .brand-name {
+    text-align: right;
+    margin-bottom: 40px;
+  }
+  
+  .total-label {
+    text-align: right;
+  }
+  
+  .total-amount {
+    text-align: right;
+    font-size: 40px;
+    margin-bottom: 0;
+  }
+  
+  .footer-left {
+    text-align: right;
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+/* Desktop (min-width: 1024px) */
+@media (min-width: 1024px) {
+  .checkout-left {
+    width: 45%;
+    padding: 40px;
+  }
+  
+  .checkout-right {
+    width: 55%;
+    padding: 40px;
+  }
+  
+  .header h2 {
+    font-size: 24px;
+  }
+}
+
+/* Large Desktop (min-width: 1200px) */
+@media (min-width: 1200px) {
+  .checkout-left {
+    width: 40%;
+  }
+  
+  .checkout-right {
+    width: 60%;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+}
+
+/* Small phones (max-width: 375px) */
+@media (max-width: 375px) {
+  .checkout-left,
+  .checkout-right {
+    padding: 20px 15px;
+  }
+  
+  .header h2 {
+    font-size: 20px;
+  }
+  
+  .total-amount {
+    font-size: 32px;
+  }
+  
+  .order-summary {
+    padding: 15px;
+  }
+  
+  .input {
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .pay-btn {
+    padding: 16px;
+    font-size: 15px;
+  }
+  
+  .success-box {
+    padding: 20px 15px;
+  }
+  
+  .success-box h2 {
+    font-size: 24px;
+  }
+}
+
+/* Extra small phones (max-width: 320px) */
+@media (max-width: 320px) {
+  .row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .row .input {
+    min-width: 100%;
+  }
+  
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .lang {
+    align-self: flex-end;
+  }
+}
+
+/* Landscape mode for phones */
+@media (max-height: 600px) and (orientation: landscape) {
+  .checkout-wrapper {
+    flex-direction: row;
+  }
+  
+  .checkout-left {
+    width: 35%;
+    padding: 20px;
+    order: 1;
+  }
+  
+  .checkout-right {
+    width: 65%;
+    padding: 20px;
+    order: 2;
+  }
+  
+  .brand-name {
+    margin-bottom: 20px;
+  }
+  
+  .total-amount {
+    font-size: 32px;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white;
+  }
+  
+  .checkout-wrapper {
+    flex-direction: column;
+  }
+  
+  .checkout-left,
+  .checkout-right {
+    width: 100%;
+    padding: 20px;
+  }
+  
+  .pay-btn,
+  .lang,
+  .footer-left {
+    display: none;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .pay-btn,
+  .pay-btn:hover:not(:disabled),
+  .pay-btn:active:not(:disabled) {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #1a1a1a;
+  }
+  
+  .checkout-left {
+    background: #2d2d2d;
+  }
+  
+  .checkout-right {
+    background: #2d2d2d;
+    color: #e0e0e0;
+  }
+  
+  .header h2,
+  .section label,
+  .order-summary h4,
+  .order-detail,
+  .success-box h2,
+  .success-box p {
+    color: #e0e0e0;
+  }
+  
+  .input {
+    background: #3a3a3a;
+    border-color: #555;
+    color: #e0e0e0;
+  }
+  
+  .input::placeholder {
+    color: #888;
+  }
+  
+  .card-box {
+    background: #3a3a3a;
+    border-color: #4f6cff;
+  }
+  
+  .order-summary {
+    background: #3a3a3a;
+    border-color: #444;
+  }
+  
+  .secure {
+    color: #aaa;
+  }
+  
+  .redirect-message {
+    background: #3a3a3a;
+    border-color: #444;
+    color: #ccc;
+  }
+  
+  .success-screen {
+    background: #2d2d2d;
+  }
+  
+  .txn {
+    background: #3a3a3a;
+    color: #ccc;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="checkout-wrapper" id="checkoutPage">
+
+  <!-- LEFT -->
+  <div class="checkout-left">
+    <div>
+      <div class="brand-name">ماكدونالدز</div>
+      <div class="total-label">إجمالي المبلغ</div>
+      <div class="total-amount" id="totalAmount">﷼ 0.00</div>
+    </div>
+    <div class="footer-left">بوابة الدفع التجريبية</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="checkout-right">
+    <div class="header">
+      <h2>تأكيد الطلب</h2>
+      <div class="lang">AR</div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h4>ملخص الطلب</h4>
+      <div id="orderDetails">
+        <!-- Order details will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <div class="section">
+      <label>بيانات التواصل</label>
+      <div class="row">
+        <input class="input" type="email" placeholder="البريد الإلكتروني">
+        <input class="input" type="text" placeholder="+966 10 000 0000">
+      </div>
+    </div>
+
+    <div class="section">
+      <label>طريقة الدفع</label>
+      <div class="payment-methods">
+        <div class="card-box disabled" id="cardMethod" onclick="selectPaymentMethod('card')">
+          <span>💳 الدفع الإلكتروني</span>
+          <span class="payment-badge">قريباً</span>
+        </div>
+        <div class="card-box selected" id="cashMethod" onclick="selectPaymentMethod('cash')">
+          <span>💵 الدفع عند الاستلام</span>
+        </div>
+      </div>
+      <div id="paymentHint" class="payment-hint">الدفع الإلكتروني سيكون متاحاً قريباً</div>
+    </div>
+
+    <div class="section hidden" id="cardInfoSection">
+      <label>بيانات البطاقة</label>
+      <input class="input" type="text" placeholder="1234 1234 1234 1234">
+      <div class="row" style="margin-top:10px;">
+        <input class="input" type="text" placeholder="MM/YY">
+        <input class="input" type="text" placeholder="CVV">
+      </div>
+    </div>
+
+    <div class="section hidden" id="cardHolderSection">
+      <label>اسم حامل البطاقة</label>
+      <input class="input" type="text" placeholder="الاسم كما هو على البطاقة">
+    </div>
+
+    <button id="payBtn" class="pay-btn" onclick="processPayment()">تأكيد الطلب ﷼ 0.00</button>
+    <div class="secure" id="secureText">💵 الدفع نقداً عند الاستلام</div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="successScreen">
+  <div class="success-box">
+    <div class="success-icon">✔</div>
+    <h2>تم تأكيد الطلب</h2>
+    <p>تم تسجيل طلب الدفع عند الاستلام بنجاح.</p>
+    <div class="txn">رقم العملية: #TXN<span id="txnId">000000</span></div>
+    <div class="redirect-message">
+      جاري إعادتك إلى المحادثة مع ملخص الطلب...
+    </div>
+  </div>
+</div>
+
+<script>
+// Get order details from URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+const orderId = urlParams.get('orderId') || '1234';
+// FIX 1: Convert total to number properly (parseFloat instead of string)
+const total = parseFloat(urlParams.get('total')) || 0;
+const items = urlParams.get('items') || '0';
+const delivery = urlParams.get('delivery') || 'pickup';
+
+// Helper function to safely format currency to 2 decimal places
+function formatCurrency(value) {
+  // Ensure we're working with a number
+  const num = typeof value === 'number' ? value : parseFloat(value) || 0;
+  // Fix floating point precision issues by rounding to 2 decimal places
+  return num.toFixed(2);
+}
+
+// Display order details
+function displayOrderDetails() {
+  // FIX 2: Round all displayed currency values to 2 decimal places
+  const formattedTotal = formatCurrency(total);
+  
+  // Update total amount displays
+  document.getElementById('totalAmount').textContent = `﷼ ${formattedTotal}`;
+  document.getElementById('payBtn').textContent = `تأكيد الطلب ﷼ ${formattedTotal}`;
+  
+  // Display order summary
+  const orderDetails = document.getElementById('orderDetails');
+  const deliveryFee = delivery === 'delivery' ? 16 : 0;
+  
+  // FIX 3: Fix subtotal calculation with proper rounding
+  const subtotal = total - deliveryFee;
+  const formattedSubtotal = formatCurrency(subtotal);
+  const formattedDeliveryFee = formatCurrency(deliveryFee);
+  
+  orderDetails.innerHTML = `
+    <div class="order-detail">
+      <span>عدد الأصناف:</span>
+      <span>${items}</span>
+    </div>
+    <div class="order-detail">
+      <span>المجموع الفرعي:</span>
+      <span>${formattedSubtotal} ريال</span>
+    </div>
+    ${delivery === 'delivery' ? `
+    <div class="order-detail">
+      <span>رسوم التوصيل:</span>
+      <span>${formattedDeliveryFee} ريال</span>
+    </div>
+    ` : ''}
+    <div class="order-detail total">
+      <span>الإجمالي:</span>
+      <span>${formattedTotal} ريال</span>
+    </div>
+  `;
+}
+
+let selectedPaymentMethod = 'cash';
+
+// Auto-redirect back to WhatsApp after payment success
+function redirectToWhatsApp() {
+  setTimeout(() => {
+    // Redirect back to WhatsApp with success parameters
+    window.location.href = `./index.html?payment=success&orderId=${orderId}&source=checkout&method=${selectedPaymentMethod}`;
+  }, 3000); // 3 seconds delay to show success message
+}
+
+function updatePaymentUI() {
+  const cardMethod = document.getElementById('cardMethod');
+  const cashMethod = document.getElementById('cashMethod');
+  const paymentHint = document.getElementById('paymentHint');
+  const cardInfoSection = document.getElementById('cardInfoSection');
+  const cardHolderSection = document.getElementById('cardHolderSection');
+  const payBtn = document.getElementById('payBtn');
+  const secureText = document.getElementById('secureText');
+
+  cardMethod.classList.remove('selected');
+  cashMethod.classList.remove('selected');
+
+  if (selectedPaymentMethod === 'cash') {
+    cashMethod.classList.add('selected');
+    paymentHint.classList.remove('show');
+    cardInfoSection.classList.add('hidden');
+    cardHolderSection.classList.add('hidden');
+    payBtn.disabled = false;
+    payBtn.textContent = `تأكيد الطلب ﷼ ${formatCurrency(total)}`;
+    secureText.textContent = '💵 الدفع نقداً عند الاستلام';
+  } else {
+    paymentHint.classList.add('show');
+    cardInfoSection.classList.add('hidden');
+    cardHolderSection.classList.add('hidden');
+    payBtn.disabled = true;
+    payBtn.textContent = 'الدفع الإلكتروني قريباً';
+    secureText.textContent = '⏳ الدفع الإلكتروني سيكون متاحاً قريباً';
+  }
+}
+
+function selectPaymentMethod(method) {
+  if (method === 'card') {
+    selectedPaymentMethod = 'card';
+    updatePaymentUI();
+    return;
+  }
+
+  selectedPaymentMethod = 'cash';
+  updatePaymentUI();
+}
+
+function processPayment() {
+  if (selectedPaymentMethod !== 'cash') {
+    document.getElementById('paymentHint').classList.add('show');
+    return;
+  }
+
+  const btn = document.getElementById("payBtn");
+  btn.innerText = "جاري تأكيد الطلب...";
+  btn.disabled = true;
+
+  // Generate random transaction ID
+  document.getElementById("txnId").textContent = Math.floor(100000 + Math.random() * 900000);
+
+  setTimeout(() => {
+    document.getElementById("checkoutPage").style.display = "none";
+    document.getElementById("successScreen").style.display = "flex";
+    
+    // Auto-redirect to WhatsApp after payment success
+    redirectToWhatsApp();
+  }, 2500);
+}
+
+// Initialize page
+window.onload = function() {
+  displayOrderDetails();
+  updatePaymentUI();
+  
+  // Add input validation
+  const inputs = document.querySelectorAll('.input');
+  inputs.forEach(input => {
+    input.addEventListener('input', function() {
+      this.style.borderColor = '#ddd';
+    });
+  });
+};
+
+// Handle window resize for better mobile experience
+window.addEventListener('resize', function() {
+  // Adjust layout for very small screens
+  if (window.innerWidth <= 320) {
+    document.querySelectorAll('.row').forEach(row => {
+      if (row.children.length > 1 && row.style.flexDirection !== 'column') {
+        row.style.flexDirection = 'column';
+        row.style.gap = '10px';
+      }
+    });
+  } else {
+    document.querySelectorAll('.row').forEach(row => {
+      if (row.style.flexDirection === 'column') {
+        row.style.flexDirection = '';
+        row.style.gap = '';
+      }
+    });
+  }
+});
+</script>
+
+</body>
+</html>
